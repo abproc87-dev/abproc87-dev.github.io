@@ -2159,15 +2159,44 @@
         });
         const obs = new IntersectionObserver(entries => { entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }); }, { threshold: .08 });
         document.querySelectorAll('.fade').forEach(el => obs.observe(el));
+async function handleSubmit(e) {
+  e.preventDefault();
+  const form = e.target;
+  const inputs = form.querySelectorAll('input[type="text"]');
+  const b = form.querySelector('.fsub');
+  b.textContent = 'Sending...';
+  b.disabled = true;
 
-        function handleSubmit(e) {
-            {
-                e.preventDefault();
-                const b = e.target.querySelector('.fsub');
-                b.textContent = '✓ Message Sent!'; b.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)'; b.style.boxShadow = '0 0 28px rgba(34,197,94,.4)';
-                setTimeout(() => { { b.textContent = 'Send Message →'; b.style.background = ''; b.style.boxShadow = ''; e.target.reset(); } }, 3500);
-            }
-        }
+  const data = {
+    name:     inputs[0].value,
+    business: inputs[1].value,
+    email:    form.querySelector('input[type="email"]').value,
+    interest: form.querySelector('select').value,
+    message:  form.querySelector('textarea').value
+  };
+
+  try {
+    await fetch('https://script.google.com/macros/s/AKfycbxGKIJAQbcY60ylTx72LpDbXd1D6BWf_Pc719_n_TL_JCZfVhd6mso7TEfAbhYC1hGC/exec', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data)
+    });
+    b.textContent = '✓ Message Sent!';
+    b.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)';
+    b.style.boxShadow = '0 0 28px rgba(34,197,94,.4)';
+    setTimeout(() => {
+      b.textContent = 'Send Message →';
+      b.style.background = '';
+      b.style.boxShadow = '';
+      b.disabled = false;
+      form.reset();
+    }, 3500);
+  } catch(err) {
+    b.textContent = 'Error — try again';
+    b.disabled = false;
+  }
+}
 
         function toggleMenu(){
   document.getElementById('mobMenu').classList.toggle('open');
